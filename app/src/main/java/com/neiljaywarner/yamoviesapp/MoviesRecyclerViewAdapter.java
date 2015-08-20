@@ -28,6 +28,10 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_grid_item, parent, false);
         //false b/c it attaches to root elsewhere.
 
+
+        //Somebody points out I don't think it's a requirement, but in my opinion it looks better with an image of some sort, preferably something explaining that there is a missing poster. Also, I think it's good to have the title of the movie with the error image, so users can know if they click on it, they will get the details of that particular film.﻿
+
+
         return new MoviesRecyclerViewAdapter.MovieViewHolder(itemView);
 
     }
