@@ -2,17 +2,19 @@ package com.neiljaywarner.yamoviesapp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
 
-/**
- * A placeholder fragment containing a simple view.
- */
+
 public class MainActivityFragment extends Fragment {
+
+    private static final int NUM_COLUMNS_GRIDVIEW = 2;
+    private MoviesRecyclerViewAdapter adapter;
 
     public MainActivityFragment() {
     }
@@ -23,11 +25,12 @@ public class MainActivityFragment extends Fragment {
 
 
         MoviePage moviePage = MoviePage.getDummyMoviePage3();
-        Log.i("NJW", "Movie1 Original Title=" + moviePage.getMovie(0).getOriginalTitle());
-        Log.i("NJW", "Movie2 Poster Path=" + moviePage.getMovie(1).getPosterFullUrl());
 
-
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View root = inflater.inflate(R.layout.fragment_main, container, false);
+        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
+        recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
+        recyclerView.setAdapter(new MoviesRecyclerViewAdapter(moviePage.getMovies()));
+        return root;
     }
 
 
