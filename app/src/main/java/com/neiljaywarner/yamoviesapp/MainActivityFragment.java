@@ -14,7 +14,6 @@ import com.neiljaywarner.yamoviesapp.model.MoviePage;
 public class MainActivityFragment extends Fragment {
 
     private static final int NUM_COLUMNS_GRIDVIEW = 2;
-    private MoviesRecyclerViewAdapter adapter;
 
     public MainActivityFragment() {
     }
@@ -31,6 +30,8 @@ public class MainActivityFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
         recyclerView.setAdapter(new MoviesRecyclerViewAdapter(moviePage.getMovies()));
         return root;
+
+        //TODO: CHeck network connectivity at appropriate time.
     }
 
 
