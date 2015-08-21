@@ -1,6 +1,7 @@
 package com.neiljaywarner.yamoviesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
@@ -42,7 +43,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
     @Override
     public void onBindViewHolder(MoviesRecyclerViewAdapter.MovieViewHolder holder, int position) {
-        String posterUrl = movies.get(position).getPosterFullUrl();
+        final YAMovie movie = movies.get(position);
 
         //* Calculate the width of the screen and divide by two so each poster takes up its full column.
         WindowManager wm = (WindowManager) holder.imageViewPoster.getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -53,7 +54,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         int height = point.y;
         int imageWidth = (width / 2);
         int imageHeight = (height / 2);
-        Picasso.with(holder.imageViewPoster.getContext()).load(posterUrl).resize(imageWidth, imageHeight).into(holder.imageViewPoster);
+        Picasso.with(holder.imageViewPoster.getContext()).load(movie.getPosterFullUrl()).resize(imageWidth, imageHeight).into(holder.imageViewPoster);
 
         //TODO: Loading Image and fail image if it were in production,
         // possible fail image animated 10,9,8 gif via compile 'com.felipecsl:gifimageview:1.2.0'
@@ -61,6 +62,23 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         // or something better.
 
         //or maybe http://www.mycutegraphics.com/graphics/movie/movie-night.html
+
+        holder.imageViewPoster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoDetailScreen(v.getContext(), movie);
+            }
+        });
+
+    }
+
+    /**
+     * @param movie The movie to show details for.
+     */
+    private void gotoDetailScreen(Context context, YAMovie movie) {
+        Intent intent = new Intent(context, MovieDetailActivity.class);
+
+        context.startActivity(intent);
     }
 
     @Override
