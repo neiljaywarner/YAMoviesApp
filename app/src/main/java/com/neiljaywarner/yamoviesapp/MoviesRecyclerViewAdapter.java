@@ -1,9 +1,13 @@
 package com.neiljaywarner.yamoviesapp;
 
+import android.content.Context;
+import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
@@ -38,12 +42,19 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
     @Override
     public void onBindViewHolder(MoviesRecyclerViewAdapter.MovieViewHolder holder, int position) {
-        //  holder.textView.setText(movies.get(position).getOriginalTitle());
         String posterUrl = movies.get(position).getPosterFullUrl();
-        //    Picasso.with(holder.imageViewPoster.getContext())
-        //           .load(posterUrl).into(holder.imageViewPoster);
-        Picasso.with(holder.imageViewPoster.getContext()).load(posterUrl).resize(400, 600).into(holder.imageViewPoster);
-        // Picasso.with(holder.imageViewPoster.getContext()).load(posterUrl).fit().into(holder.imageViewPoster);
+
+        //* Calculate the width of the screen and divide by two so each poster takes up its full column.
+        WindowManager wm = (WindowManager) holder.imageViewPoster.getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+        int width = point.x;
+        int height = point.y;
+        int imageWidth = (width / 2);
+        int imageHeight = (height / 2);
+        Picasso.with(holder.imageViewPoster.getContext()).load(posterUrl).resize(imageWidth, imageHeight).into(holder.imageViewPoster);
+
         //TODO: Loading Image and fail image if it were in production,
         // possible fail image animated 10,9,8 gif via compile 'com.felipecsl:gifimageview:1.2.0'
         // https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0CAcQjRxqFQoTCOXStcKruMcCFUwakgodsBwMvA&url=%2Furl%3Fsa%3Di%26rct%3Dj%26q%3D%26esrc%3Ds%26source%3Dimages%26cd%3D%26cad%3Drja%26uact%3D8%26ved%3D0CAcQjRxqFQoTCOXStcKruMcCFUwakgodsBwMvA%26url%3Dhttp%253A%252F%252Fwww.tejadirects.com%252F%26ei%3DDCPWVeWcHsy0yASwubDgCw%26psig%3DAFQjCNGKqm2eloa8vAIt9GNbAlIHJWASaQ%26ust%3D1440183434178045&ei=DCPWVeWcHsy0yASwubDgCw&psig=AFQjCNGKqm2eloa8vAIt9GNbAlIHJWASaQ&ust=1440183434178045
@@ -64,7 +75,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
             super(itemView);
             imageViewPoster = (ImageView) itemView.findViewById(R.id.imageViewPoster);
 
-            // Question: Should they be format imageview_poster for best practice?
+            // Question: Should the id be like "imageview_poster" instead of "imageViewPoster" for best practice?
 
         }
     }
