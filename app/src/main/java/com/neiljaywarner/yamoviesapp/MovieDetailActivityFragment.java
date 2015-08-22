@@ -12,9 +12,7 @@ import com.neiljaywarner.yamoviesapp.model.YAMovie;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-/**
- * A placeholder fragment containing a simple view.
- */
+
 public class MovieDetailActivityFragment extends Fragment {
 
     TextView mTextViewTitle, mTextViewYear, mTextViewVoteAverage, mTextViewOverview;
@@ -39,13 +37,12 @@ public class MovieDetailActivityFragment extends Fragment {
 
         mTextViewTitle.setText(movie.getOriginalTitle());
 
-        //TODO: Loadiang image for screen with possible crossfade.
 
         Picasso.with(getContext()).load(movie.getPosterFullUrl())
                 .into(imageViewThumbnail, new Callback.EmptyCallback() {
                     @Override
                     public void onSuccess() {
-                        loadDetailText(movie);  //if placeholder image then could load success text right away.
+                        loadDetailText(movie);
                         //  Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap(); // Ew!
                         //  Palette palette = PaletteTransformation.getPalette(bitmap);
                         // TODO apply palette to text views, backgrounds, etc.
@@ -59,7 +56,7 @@ public class MovieDetailActivityFragment extends Fragment {
                     }
                 });
 
-        //Question - should I
+        //TODO: Fix this when i have placeholder image, probably upon error set the image visible.  Then I woudn't need loading spinner?
 
 
         //TODO: Cool activity transitions and get background color from pallette in picture; but I want to make sure I turn it in on time
