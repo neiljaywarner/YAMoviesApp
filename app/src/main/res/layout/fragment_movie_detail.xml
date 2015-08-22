@@ -11,28 +11,28 @@
         android:layout_height="wrap_content"
         android:background="@android:color/holo_green_light"
         android:padding="@dimen/activity_horizontal_margin"
-        android:text="Chappie" />
+        android:textSize="45sp" />
 
     <ImageView
-        android:id="@+id/imageViewPoster"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:id="@+id/imageViewThumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/textViewTitle"
+        android:layout_margin="@dimen/activity_horizontal_margin"
         android:src="@android:drawable/ic_lock_lock" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewTitle"
-        android:layout_margin="10dp"
-        android:layout_toRightOf="@id/imageViewPoster"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_toRightOf="@id/imageViewThumbnail"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/textViewYear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="2015"
             android:textSize="28sp" />
 
         <TextView
@@ -40,20 +40,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="120min"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            android:visibility="gone" />
 
+        <!-- Duration is in the mockup but not the json or the rubric -->
         <TextView
-            android:id="@+id/textViewReviews"
+            android:id="@+id/textViewVoteAverage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="8.1/10" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/textViewOverview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageViewPoster"
-        android:text="Plot Synopsis" />
+        android:layout_below="@id/imageViewThumbnail"
+        android:layout_margin="@dimen/activity_horizontal_margin" />
 
 </RelativeLayout>

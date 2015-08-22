@@ -78,6 +78,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     private void gotoDetailScreen(Context context, YAMovie movie) {
         Intent intent = new Intent(context, MovieDetailActivity.class);
 
+        intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
         context.startActivity(intent);
     }
 
