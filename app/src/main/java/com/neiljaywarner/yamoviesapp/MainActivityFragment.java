@@ -20,7 +20,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     //   private static final String TAG = MainActivityFragment.class.getSimpleName();
     private static final String TAG = "NJW";
 
-    public static MoviePageSortType sCurrentSortType = MoviePageSortType.highest_rated;
+
+    public MoviesRecyclerViewAdapter mAdapter;
     //TODO: What's the right way to do this?
 
     public MainActivityFragment() {
@@ -35,6 +36,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
         getLoaderManager().initLoader(0, null, this);
+
     }
 
     @Override
@@ -47,7 +49,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         View root = inflater.inflate(R.layout.fragment_main, container, false);
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
-        recyclerView.setAdapter(new MoviesRecyclerViewAdapter(moviePage.getMovies()));
+        mAdapter = new MoviesRecyclerViewAdapter();
+        recyclerView.setAdapter(mAdapter);
+        mAdapter.setData(MoviePage.getDummyMoviePage3());
         return root;
 
         //TODO: CHeck network connectivity at appropriate time.
@@ -74,6 +78,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoaderReset(Loader<MoviePage> loader) {
+        mAdapter.setData(null);
 
     }
 
