@@ -27,8 +27,10 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
 
     public void setData(MoviePage moviePage) {
-        movies = moviePage.getMovies();
-        this.notifyDataSetChanged();
+        if (moviePage != null) {
+            movies = moviePage.getMovies();
+            this.notifyDataSetChanged();
+        }
     }
     @Override
     public MoviesRecyclerViewAdapter.MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
