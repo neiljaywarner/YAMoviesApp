@@ -51,7 +51,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
         mAdapter = new MoviesRecyclerViewAdapter();
         recyclerView.setAdapter(mAdapter);
-        mAdapter.setData(MoviePage.getDummyMoviePage3());
+        // mAdapter.setData(MoviePage.getDummyMoviePage3());
         return root;
 
         //TODO: CHeck network connectivity at appropriate time.
@@ -72,6 +72,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         Log.i(TAG, "in onLoadFinished");
         // mAdapter.setData(data.getMovies());
         Log.i("NJW", "firstTile=" + data.getMovie(1).getOriginalTitle());
+        mAdapter.setData(data);
 
 
     }

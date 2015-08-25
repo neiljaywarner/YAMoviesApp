@@ -15,6 +15,7 @@ import com.neiljaywarner.yamoviesapp.model.MoviePage;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ import java.util.List;
  */
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.MovieViewHolder> {
 
-    private List<YAMovie> movies;
+    private List<YAMovie> movies = new ArrayList<>();
 
 
     public void setData(MoviePage moviePage) {
