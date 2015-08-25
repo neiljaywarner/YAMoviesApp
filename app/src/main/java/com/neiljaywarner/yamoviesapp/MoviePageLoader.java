@@ -95,6 +95,7 @@ public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
 
     }
 
+    //Used retrofit's example on their web page and the apploader example some.
 
 }
 
