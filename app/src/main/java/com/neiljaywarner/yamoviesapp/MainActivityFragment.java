@@ -1,5 +1,8 @@
 package com.neiljaywarner.yamoviesapp;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
 
@@ -39,7 +43,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onActivityCreated(savedInstanceState);
 
 
-        getLoaderManager().initLoader(0, null, this);
+        if (isOnline(this.getContext())) {
+            getLoaderManager().initLoader(0, null, this);
+        } else {
+            Toast.makeText(this.getContext(), "Please check internet connection and try again.", Toast.LENGTH_LONG).show();
+            this.getActivity().finish();
+            //TODO: Dialog or snackbar.
+        }
 
     }
 
@@ -67,6 +77,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             loadHighestRated();
             return true;
         }
+        //NOTE: for now it's OK to reload/refresh when selecting the same one...
 
         return super.onOptionsItemSelected(item);
     }
@@ -87,7 +98,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
 
 
         View root = inflater.inflate(R.layout.fragment_main, container, false);
@@ -123,6 +133,17 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onLoaderReset(Loader<MoviePage> loader) {
         mAdapter.setData(null);
 
+    }
+
+    public boolean isOnline(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
     }
 
 
