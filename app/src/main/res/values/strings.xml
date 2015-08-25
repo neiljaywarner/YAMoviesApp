@@ -4,6 +4,9 @@
     <string name="action_sort_popularity">Sort by popularity</string>
     <string name="action_sort_rating">Sort by highest rated</string>
 
+    <string name="most_popular">Most Popular</string>
+    <string name="highest_rated">Highest Rated</string>
+
 
     <string name="title_activity_movie_detail">MovieDetailActivity</string>
 </resources>

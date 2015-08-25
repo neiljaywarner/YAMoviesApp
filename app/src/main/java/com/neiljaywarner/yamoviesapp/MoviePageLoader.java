@@ -15,7 +15,7 @@ import retrofit.http.Query;
  */
 public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
 
-    private static final String TAG = "NJW";
+    private static final String TAG = MoviePageLoader.class.getSimpleName();
     public static MoviePageSortType moviePageSortType = MoviePageSortType.most_popular;
     private MoviePage mMoviePage;
     private boolean dataIsReady = false;
@@ -23,8 +23,6 @@ public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
 
     public MoviePageLoader(Context context) {
         super(context);
-        Log.i(TAG, "in loader constructor");
-
     }
 
     public void load(MoviePageSortType sortType) {
@@ -72,17 +70,14 @@ public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
         TheMovieDbMoviesService service = restAdapter.create(TheMovieDbMoviesService.class);
 
         if (moviePageSortType == MoviePageSortType.most_popular) {
-            Log.i(TAG, "About to hit most pop endpoint.");
             mMoviePage = service.getPopularMovieFirstPage(TheMovieDb.APIKey);
         }
 
         if (moviePageSortType == MoviePageSortType.highest_rated) {
-            Log.i(TAG, "About to hit highest rated sort on endpoint.");
-
             mMoviePage = service.getHighestRated(TheMovieDb.APIKey);
         }
         dataIsReady = true;
-        // Done!
+
         return mMoviePage;
     }
 

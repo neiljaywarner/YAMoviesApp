@@ -20,8 +20,7 @@ import com.neiljaywarner.yamoviesapp.model.MoviePage;
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<MoviePage> {
 
     private static final int NUM_COLUMNS_GRIDVIEW = 2;
-    //   private static final String TAG = MainActivityFragment.class.getSimpleName();
-    private static final String TAG = "NJW";
+    private static final String TAG = MainActivityFragment.class.getSimpleName();
 
 
     public MoviesRecyclerViewAdapter mAdapter;
@@ -58,11 +57,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_sort_popularity) {
+            this.getActivity().setTitle(R.string.most_popular);
             loadMostPopular();
             return true;
         }
 
         if (id == R.id.action_sort_rating) {
+            this.getActivity().setTitle(R.string.highest_rated);
             loadHighestRated();
             return true;
         }
@@ -94,6 +95,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
         mAdapter = new MoviesRecyclerViewAdapter();
         recyclerView.setAdapter(mAdapter);
+        this.getActivity().setTitle(R.string.most_popular);
         return root;
 
         //TODO: CHeck network connectivity at appropriate time.
