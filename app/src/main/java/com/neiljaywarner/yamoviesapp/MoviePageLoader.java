@@ -16,14 +16,25 @@ import retrofit.http.Query;
 public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
 
     private static final String TAG = "NJW";
+    public static MoviePageSortType moviePageSortType = MoviePageSortType.most_popular;
     private MoviePage mMoviePage;
     private boolean dataIsReady = false;
+    //TODO: What's the right way to do this?  subclass? composition? when rxjava doens't matter but it'd be nice to get it right.
 
     public MoviePageLoader(Context context) {
         super(context);
         Log.i(TAG, "in loader constructor");
 
     }
+
+    public void load(MoviePageSortType sortType) {
+        MoviePageLoader.moviePageSortType = sortType;
+        dataIsReady = false;
+        onStartLoading();
+    }
+
+
+
 
     @Override
     protected void onStartLoading() {
@@ -60,7 +71,16 @@ public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
 
         TheMovieDbMoviesService service = restAdapter.create(TheMovieDbMoviesService.class);
 
-        mMoviePage = service.getPopularMovieFirstPage(TheMovieDb.APIKey);
+        if (moviePageSortType == MoviePageSortType.most_popular) {
+            Log.i(TAG, "About to hit most pop endpoint.");
+            mMoviePage = service.getPopularMovieFirstPage(TheMovieDb.APIKey);
+        }
+
+        if (moviePageSortType == MoviePageSortType.highest_rated) {
+            Log.i(TAG, "About to hit highest rated sort on endpoint.");
+
+            mMoviePage = service.getHighestRated(TheMovieDb.APIKey);
+        }
         dataIsReady = true;
         // Done!
         return mMoviePage;
@@ -73,6 +93,10 @@ public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
     public interface TheMovieDbMoviesService {
         @GET("/3/discover/movie?sort_by=popularity.desc&page=1")
         MoviePage getPopularMovieFirstPage(@Query("api_key") String apiKey);
+
+        @GET("/3/discover/movie?sort_by=vote_average.desc&page=1")
+        MoviePage getHighestRated(@Query("api_key") String apiKey);
+
 
     }
 
