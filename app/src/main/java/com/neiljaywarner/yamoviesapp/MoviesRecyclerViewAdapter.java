@@ -38,7 +38,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
 
 
         //Somebody points out I don't think it's a requirement, but in my opinion it looks better with an image of some sort, preferably something explaining that there is a missing poster. Also, I think it's good to have the title of the movie with the error image, so users can know if they click on it, they will get the details of that particular film.﻿
-
+        //eg todo: title in gridview if image load fail
 
         return new MoviesRecyclerViewAdapter.MovieViewHolder(itemView);
 

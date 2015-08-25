@@ -73,6 +73,7 @@ public class MoviePageLoader extends AsyncTaskLoader<MoviePage> {
     public interface TheMovieDbMoviesService {
         @GET("/3/discover/movie?sort_by=popularity.desc&page=1")
         MoviePage getPopularMovieFirstPage(@Query("api_key") String apiKey);
+
     }
 
 

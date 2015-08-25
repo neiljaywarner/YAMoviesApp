@@ -22,7 +22,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
 
     public MoviesRecyclerViewAdapter mAdapter;
-    //TODO: What's the right way to do this?
 
     public MainActivityFragment() {
     }
@@ -33,8 +32,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onActivityCreated(savedInstanceState);
 
 
-        // Prepare the loader.  Either re-connect with an existing one,
-        // or start a new one.
         getLoaderManager().initLoader(0, null, this);
 
     }
@@ -44,14 +41,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                              Bundle savedInstanceState) {
 
 
-        MoviePage moviePage = MoviePage.getDummyMoviePage3();
 
         View root = inflater.inflate(R.layout.fragment_main, container, false);
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
         mAdapter = new MoviesRecyclerViewAdapter();
         recyclerView.setAdapter(mAdapter);
-        // mAdapter.setData(MoviePage.getDummyMoviePage3());
         return root;
 
         //TODO: CHeck network connectivity at appropriate time.
@@ -70,8 +65,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<MoviePage> loader, MoviePage data) {
         Log.i(TAG, "in onLoadFinished");
-        // mAdapter.setData(data.getMovies());
-        Log.i("NJW", "firstTile=" + data.getMovie(1).getOriginalTitle());
         mAdapter.setData(data);
 
 
