@@ -5,8 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,14 +18,21 @@ import android.widget.Toast;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<MoviePage> {
+
+public class MainActivityFragment extends Fragment {
 
     private static final int NUM_COLUMNS_GRIDVIEW = 2;
     private static final String TAG = MainActivityFragment.class.getSimpleName();
 
 
     public MoviesRecyclerViewAdapter mAdapter;
+    private CompositeSubscription mCompositeSubscription;
 
     public MainActivityFragment() {
     }
@@ -44,7 +49,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
 
         if (isOnline(this.getContext())) {
-            getLoaderManager().initLoader(0, null, this);
+            updateMoviesPage();
         } else {
             Toast.makeText(this.getContext(), "Please check internet connection and try again.", Toast.LENGTH_LONG).show();
             this.getActivity().finish();
@@ -84,14 +89,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     public void loadMostPopular() {
         Log.i(TAG, "load most popular");
-        ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.most_popular);
+        //  ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.most_popular);
 
     }
 
     public void loadHighestRated() {
         Log.i(TAG, "load highest rated.");
 
-        ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.highest_rated);
+        //  ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.highest_rated);
 
     }
 
@@ -104,35 +109,54 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
         mAdapter = new MoviesRecyclerViewAdapter();
+
+        mCompositeSubscription = new CompositeSubscription();
+
+
+
         recyclerView.setAdapter(mAdapter);
         this.getActivity().setTitle(R.string.most_popular);
+
+        updateMoviesPage();
         return root;
 
         //TODO: CHeck network connectivity at appropriate time.
     }
 
+    private void updateMoviesPage() {
+        //        mAdapter.setData(data);
+        final MovieService movieService = new MovieService();
+        final Observable<MoviePage> moviePageObservable = movieService.getPopularMovieFirstPage(TheMovieDb.APIKey);
+        mCompositeSubscription.add(moviePageObservable
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<MoviePage>() {
+                            @Override
+                            public void onCompleted() {
+                                Log.i("NJW", "observable completed.");
+                            }
 
-    @Override
-    public Loader<MoviePage> onCreateLoader(int id, Bundle args) {
-        Log.i(TAG, "in onCreateLoader");
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.i("NJW", "observable error.");
 
+                            }
 
-        return new MoviePageLoader(getActivity());
+                            @Override
+                            public void onNext(MoviePage moviePage) {
+                                Log.i("NJW", "we 'have' a moviepage->first movie=" +
+                                        moviePage.getMovie(0).getOriginalTitle());
+                                mAdapter.setData(moviePage);
+                            }
+                        })
+        );
 
     }
 
     @Override
-    public void onLoadFinished(Loader<MoviePage> loader, MoviePage data) {
-        Log.i(TAG, "in onLoadFinished");
-        mAdapter.setData(data);
-
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<MoviePage> loader) {
-        mAdapter.setData(null);
-
+    public void onDestroyView() {
+        mCompositeSubscription.unsubscribe();
+        super.onDestroyView();
     }
 
     public boolean isOnline(Context context) {
@@ -145,8 +169,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         return isConnected;
     }
-
-
 
 }
 
