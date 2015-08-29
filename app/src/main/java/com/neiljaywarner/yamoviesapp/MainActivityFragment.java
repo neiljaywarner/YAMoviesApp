@@ -29,10 +29,12 @@ public class MainActivityFragment extends Fragment {
 
     private static final int NUM_COLUMNS_GRIDVIEW = 2;
     private static final String TAG = MainActivityFragment.class.getSimpleName();
+    private static final String MOVIE_PAGE = "MOVIE_PAGE";
 
 
     public MoviesRecyclerViewAdapter mAdapter;
     private CompositeSubscription mCompositeSubscription;
+    private MoviePage mMoviePage;
 
     public MainActivityFragment() {
     }
@@ -43,21 +45,18 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    //TODO: Consider rx 'replay' operator instead?
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-
-        if (isOnline(this.getContext())) {
-            updateMoviesPage();
-        } else {
-            Toast.makeText(this.getContext(), "Please check internet connection and try again.", Toast.LENGTH_LONG).show();
-            this.getActivity().finish();
-            //TODO: Dialog or snackbar.
-        }
-
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(MOVIE_PAGE, mMoviePage);
     }
 
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.i("NJW", "View State Restored");
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -112,21 +111,28 @@ public class MainActivityFragment extends Fragment {
 
         mCompositeSubscription = new CompositeSubscription();
 
-
-
         recyclerView.setAdapter(mAdapter);
         this.getActivity().setTitle(R.string.most_popular);
 
-        updateMoviesPage();
+        if (savedInstanceState == null) {
+            updateMoviesPage();
+        } else {
+            mMoviePage = savedInstanceState.getParcelable(MOVIE_PAGE);
+            mAdapter.setData(mMoviePage);
+
+        }
+
         return root;
 
-        //TODO: CHeck network connectivity at appropriate time.
     }
 
     private void updateMoviesPage() {
-        //        mAdapter.setData(data);
-        final MovieService movieService = new MovieService();
+        final MovieService movieService = MovieService.getInstance();
         final Observable<MoviePage> moviePageObservable = movieService.getPopularMovieFirstPage(TheMovieDb.APIKey);
+        if (moviePageObservable == null) {
+            Log.i("NJW", "retrofit observable=null; airplane mode etd?");
+            return;
+        }
         mCompositeSubscription.add(moviePageObservable
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -138,7 +144,9 @@ public class MainActivityFragment extends Fragment {
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.i("NJW", "observable error.");
+                                Log.i("NJW", "observable error;" + e.getMessage());
+                                Toast.makeText(getActivity().getApplicationContext(), "..Please check internet connection and try again.", Toast.LENGTH_LONG).show();
+                                //TODO: REFRESH BUTTON IN ACTION BAR?
 
                             }
 
@@ -146,7 +154,8 @@ public class MainActivityFragment extends Fragment {
                             public void onNext(MoviePage moviePage) {
                                 Log.i("NJW", "we 'have' a moviepage->first movie=" +
                                         moviePage.getMovie(0).getOriginalTitle());
-                                mAdapter.setData(moviePage);
+                                mMoviePage = moviePage;
+                                mAdapter.setData(mMoviePage);
                             }
                         })
         );

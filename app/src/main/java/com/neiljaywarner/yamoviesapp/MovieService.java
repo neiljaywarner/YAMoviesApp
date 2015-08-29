@@ -14,9 +14,12 @@ import rx.Observable;
  */
 public class MovieService {
 
+    private static MovieService sInstance = new MovieService();
+    private static Observable<MoviePage> sPopularMoviesFirstPage;
+    private static Observable<MoviePage> sTopRatedMoviesFirstPage;
     private TheMovieDbMoviesService mMoviesWebService;
 
-    public MovieService() {
+    private MovieService() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint("http://api.themoviedb.org")
@@ -27,10 +30,17 @@ public class MovieService {
 
     }
 
+    public static MovieService getInstance() {
+        return sInstance;
+    }
+
     //TODO: Error out if not successful, etc.
     public Observable<MoviePage> getPopularMovieFirstPage(String apiKey) {
         Log.i("NJW", "get Observable in MovieService");
-        return mMoviesWebService.getPopularMovieFirstPage(apiKey);
+        if (sPopularMoviesFirstPage == null) {
+            sPopularMoviesFirstPage = mMoviesWebService.getPopularMovieFirstPage(apiKey);
+        }
+        return sPopularMoviesFirstPage;
     }
 
     /**
