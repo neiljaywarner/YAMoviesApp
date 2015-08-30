@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">YAMoviesApp</string>
     <string name="hello_world">Hello world!</string>
+
+    <string name="action_refresh">Refresh</string>
+
     <string name="action_sort_popularity">Sort by popularity</string>
     <string name="action_sort_rating">Sort by highest rated</string>
 

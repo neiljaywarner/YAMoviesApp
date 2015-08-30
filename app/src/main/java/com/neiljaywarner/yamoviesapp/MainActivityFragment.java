@@ -71,14 +71,19 @@ public class MainActivityFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_sort_popularity) {
-            this.getActivity().setTitle(R.string.most_popular);
             updateMoviesPage(MoviePageSortType.most_popular);
+            saveCurrentSortType(MoviePageSortType.most_popular);
             return true;
         }
 
         if (id == R.id.action_sort_rating) {
-            this.getActivity().setTitle(R.string.highest_rated);
             updateMoviesPage(MoviePageSortType.highest_rated);
+            saveCurrentSortType(MoviePageSortType.highest_rated);
+            return true;
+        }
+
+        if (id == R.id.action_refresh) {
+            updateMoviesPage();
 
             return true;
         }
@@ -87,6 +92,24 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateMoviesPage() {
+        updateMoviesPage(getCurrentSortType());
+    }
+
+    private MoviePageSortType getCurrentSortType() {
+        String sortType = this.getActivity().getApplication().getSharedPreferences("yama", Context.MODE_PRIVATE).getString("sort_type", "");
+        if (sortType.equals(MoviePageSortType.highest_rated.toString())) {
+            return MoviePageSortType.highest_rated;
+        } else {
+            return MoviePageSortType.most_popular;
+        }
+    }
+
+    private void saveCurrentSortType(MoviePageSortType sortType) {
+        this.getActivity().getApplication().getSharedPreferences("yama", Context.MODE_PRIVATE).edit().putString("sort_type", sortType.toString()).commit();
+
+
+    }
 
 
     @Override
@@ -118,6 +141,7 @@ public class MainActivityFragment extends Fragment {
 
     private void updateMoviesPage(MoviePageSortType moviePageSortType) {
         final MovieService movieService = MovieService.getInstance();
+        this.getActivity().setTitle(moviePageSortType.toString());
         final Observable<MoviePage> moviePageObservable;
         if (moviePageSortType.equals(MoviePageSortType.highest_rated)) {
             moviePageObservable = movieService.getHighestRatedMoviesFirstPage(TheMovieDb.APIKey);
@@ -140,9 +164,8 @@ public class MainActivityFragment extends Fragment {
                             @Override
                             public void onError(Throwable e) {
                                 Log.i("NJW", "observable error;" + e.getMessage());
-                                Toast.makeText(getActivity().getApplicationContext(), "..Please check internet connection and try again.", Toast.LENGTH_LONG).show();
-                                //TODO: REFRESH BUTTON IN ACTION BAR?
-
+                                Toast.makeText(getActivity().getApplicationContext(), "..Please check internet connection and refresh.", Toast.LENGTH_LONG).show();
+                                //TODO: Strings.xml strings.
                             }
 
                             @Override
