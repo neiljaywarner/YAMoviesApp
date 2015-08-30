@@ -1,8 +1,12 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.neiljaywarner.yamoviesapp.MovieDetailActivityFragment">
+
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
 
     <TextView
@@ -12,6 +16,8 @@
         android:background="@android:color/holo_green_light"
         android:padding="@dimen/activity_horizontal_margin"
         android:textSize="45sp" />
+
+        <!-- TODO: make dimens values that handles low res devices and high res devices so long titles dont' end up several lines etc-->
 
     <ImageView
         android:id="@+id/imageViewThumbnail"
@@ -58,3 +64,4 @@
         android:layout_margin="@dimen/activity_horizontal_margin" />
 
 </RelativeLayout>
+</ScrollView>

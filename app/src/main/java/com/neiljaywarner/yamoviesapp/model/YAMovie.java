@@ -18,7 +18,7 @@ public class YAMovie implements Parcelable {
         }
     };
     public final String BASE_POSTER_PATH = "http://image.tmdb.org/t/p/";
-    public final String POSTER_PATH_SIZE_STRING = "w342";
+    public final String POSTER_PATH_SIZE_STRING = "w185";
     private String original_title;
     private String poster_path; //includes "/"
     private String overview;
