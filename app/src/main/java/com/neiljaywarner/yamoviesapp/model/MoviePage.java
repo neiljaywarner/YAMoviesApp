@@ -1,5 +1,8 @@
 package com.neiljaywarner.yamoviesapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -7,9 +10,26 @@ import java.util.List;
 /**
  * Created by neil on 8/19/15.
  */
-public class MoviePage {
+public class MoviePage implements Parcelable {
+        public static final Parcelable.Creator<MoviePage> CREATOR = new Parcelable.Creator<MoviePage>() {
+                public MoviePage createFromParcel(Parcel source) {
+                        return new MoviePage(source);
+                }
+
+                public MoviePage[] newArray(int size) {
+                        return new MoviePage[size];
+                }
+        };
         private int page;
         private List<YAMovie> results;  //from JSON
+
+        public MoviePage() {
+        }
+
+        protected MoviePage(Parcel in) {
+                this.page = in.readInt();
+                this.results = in.createTypedArrayList(YAMovie.CREATOR);
+        }
 
         public static MoviePage getDummyMoviePage3() {
                 Gson gson = new Gson();
@@ -453,4 +473,14 @@ public class MoviePage {
                 return page;
         }
 
+        @Override
+        public int describeContents() {
+                return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+                dest.writeInt(this.page);
+                dest.writeTypedList(results);
+        }
 }

@@ -5,8 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,14 +18,23 @@ import android.widget.Toast;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<MoviePage> {
+
+public class MainActivityFragment extends Fragment {
 
     private static final int NUM_COLUMNS_GRIDVIEW = 2;
     private static final String TAG = MainActivityFragment.class.getSimpleName();
+    private static final String MOVIE_PAGE = "MOVIE_PAGE";
 
 
     public MoviesRecyclerViewAdapter mAdapter;
+    private CompositeSubscription mCompositeSubscription;
+    private MoviePage mMoviePage;
 
     public MainActivityFragment() {
     }
@@ -38,21 +45,18 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         setHasOptionsMenu(true);
     }
 
+    //TODO: Consider rx 'replay' operator instead?
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-
-        if (isOnline(this.getContext())) {
-            getLoaderManager().initLoader(0, null, this);
-        } else {
-            Toast.makeText(this.getContext(), "Please check internet connection and try again.", Toast.LENGTH_LONG).show();
-            this.getActivity().finish();
-            //TODO: Dialog or snackbar.
-        }
-
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(MOVIE_PAGE, mMoviePage);
     }
 
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.i("NJW", "View State Restored");
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -68,13 +72,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         int id = item.getItemId();
         if (id == R.id.action_sort_popularity) {
             this.getActivity().setTitle(R.string.most_popular);
-            loadMostPopular();
+            updateMoviesPage(MoviePageSortType.most_popular);
             return true;
         }
 
         if (id == R.id.action_sort_rating) {
             this.getActivity().setTitle(R.string.highest_rated);
-            loadHighestRated();
+            updateMoviesPage(MoviePageSortType.highest_rated);
+
             return true;
         }
         //NOTE: for now it's OK to reload/refresh when selecting the same one...
@@ -82,18 +87,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadMostPopular() {
-        Log.i(TAG, "load most popular");
-        ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.most_popular);
 
-    }
-
-    public void loadHighestRated() {
-        Log.i(TAG, "load highest rated.");
-
-        ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.highest_rated);
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -104,35 +98,69 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
         mAdapter = new MoviesRecyclerViewAdapter();
+
+        mCompositeSubscription = new CompositeSubscription();
+
         recyclerView.setAdapter(mAdapter);
         this.getActivity().setTitle(R.string.most_popular);
+
+        if (savedInstanceState == null) {
+            updateMoviesPage(MoviePageSortType.most_popular); //TODO: Use sharedpreferences
+        } else {
+            mMoviePage = savedInstanceState.getParcelable(MOVIE_PAGE);
+            mAdapter.setData(mMoviePage);
+
+        }
+
         return root;
 
-        //TODO: CHeck network connectivity at appropriate time.
     }
 
+    private void updateMoviesPage(MoviePageSortType moviePageSortType) {
+        final MovieService movieService = MovieService.getInstance();
+        final Observable<MoviePage> moviePageObservable;
+        if (moviePageSortType.equals(MoviePageSortType.highest_rated)) {
+            moviePageObservable = movieService.getHighestRatedMoviesFirstPage(TheMovieDb.APIKey);
+        } else {
+            moviePageObservable = movieService.getPopularMoviesFirstPage(TheMovieDb.APIKey);
+        }
+        if (moviePageObservable == null) {
+            Log.i("NJW", "retrofit observable=null; airplane mode etd?");
+            return;
+        }
+        mCompositeSubscription.add(moviePageObservable
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<MoviePage>() {
+                            @Override
+                            public void onCompleted() {
+                                Log.i("NJW", "observable completed.");
+                            }
 
-    @Override
-    public Loader<MoviePage> onCreateLoader(int id, Bundle args) {
-        Log.i(TAG, "in onCreateLoader");
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.i("NJW", "observable error;" + e.getMessage());
+                                Toast.makeText(getActivity().getApplicationContext(), "..Please check internet connection and try again.", Toast.LENGTH_LONG).show();
+                                //TODO: REFRESH BUTTON IN ACTION BAR?
 
+                            }
 
-        return new MoviePageLoader(getActivity());
+                            @Override
+                            public void onNext(MoviePage moviePage) {
+                                Log.i("NJW", "we 'have' a moviepage->first movie=" +
+                                        moviePage.getMovie(0).getOriginalTitle());
+                                mMoviePage = moviePage;
+                                mAdapter.setData(mMoviePage);
+                            }
+                        })
+        );
 
     }
 
     @Override
-    public void onLoadFinished(Loader<MoviePage> loader, MoviePage data) {
-        Log.i(TAG, "in onLoadFinished");
-        mAdapter.setData(data);
-
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<MoviePage> loader) {
-        mAdapter.setData(null);
-
+    public void onDestroyView() {
+        mCompositeSubscription.unsubscribe();
+        super.onDestroyView();
     }
 
     public boolean isOnline(Context context) {
@@ -145,8 +173,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         return isConnected;
     }
-
-
 
 }
 
