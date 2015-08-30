@@ -15,7 +15,9 @@ import rx.Observable;
 public class MovieService {
 
     private static MovieService sInstance = new MovieService();
+    private static Observable<MoviePage> sHighestRatedMoviesFirstPage;
     private static Observable<MoviePage> sPopularMoviesFirstPage;
+
     private static Observable<MoviePage> sTopRatedMoviesFirstPage;
     private TheMovieDbMoviesService mMoviesWebService;
 
@@ -34,13 +36,20 @@ public class MovieService {
         return sInstance;
     }
 
-    //TODO: Error out if not successful, etc.
-    public Observable<MoviePage> getPopularMovieFirstPage(String apiKey) {
+    public Observable<MoviePage> getPopularMoviesFirstPage(String apiKey) {
         Log.i("NJW", "get Observable in MovieService");
         if (sPopularMoviesFirstPage == null) {
-            sPopularMoviesFirstPage = mMoviesWebService.getPopularMovieFirstPage(apiKey);
+            sPopularMoviesFirstPage = mMoviesWebService.getPopularMoviesFirstPage(apiKey);
         }
         return sPopularMoviesFirstPage;
+    }
+
+    public Observable<MoviePage> getHighestRatedMoviesFirstPage(String apiKey) {
+        Log.i("NJW", "get Observable in MovieService");
+        if (sHighestRatedMoviesFirstPage == null) {
+            sHighestRatedMoviesFirstPage = mMoviesWebService.getHighestRatedMoviesFirstPage(apiKey);
+        }
+        return sHighestRatedMoviesFirstPage;
     }
 
     /**
@@ -48,14 +57,13 @@ public class MovieService {
      */
     public interface TheMovieDbMoviesService {
         @GET("/3/discover/movie?sort_by=popularity.desc&page=1")
-        Observable<MoviePage> getPopularMovieFirstPage(@Query("api_key") String apiKey);
+        Observable<MoviePage> getPopularMoviesFirstPage(@Query("api_key") String apiKey);
 
         @GET("/3/discover/movie?sort_by=vote_average.desc&page=1")
-        MoviePage getHighestRated(@Query("api_key") String apiKey);
+        Observable<MoviePage> getHighestRatedMoviesFirstPage(@Query("api_key") String apiKey);
 
 
     }
 
-    //using
 
 }

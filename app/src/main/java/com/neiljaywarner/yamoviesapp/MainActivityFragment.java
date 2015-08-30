@@ -72,13 +72,14 @@ public class MainActivityFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_sort_popularity) {
             this.getActivity().setTitle(R.string.most_popular);
-            loadMostPopular();
+            updateMoviesPage(MoviePageSortType.most_popular);
             return true;
         }
 
         if (id == R.id.action_sort_rating) {
             this.getActivity().setTitle(R.string.highest_rated);
-            loadHighestRated();
+            updateMoviesPage(MoviePageSortType.highest_rated);
+
             return true;
         }
         //NOTE: for now it's OK to reload/refresh when selecting the same one...
@@ -86,18 +87,7 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadMostPopular() {
-        Log.i(TAG, "load most popular");
-        //  ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.most_popular);
 
-    }
-
-    public void loadHighestRated() {
-        Log.i(TAG, "load highest rated.");
-
-        //  ((MoviePageLoader) getLoaderManager().initLoader(0, null, this)).load(MoviePageSortType.highest_rated);
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -115,7 +105,7 @@ public class MainActivityFragment extends Fragment {
         this.getActivity().setTitle(R.string.most_popular);
 
         if (savedInstanceState == null) {
-            updateMoviesPage();
+            updateMoviesPage(MoviePageSortType.most_popular); //TODO: Use sharedpreferences
         } else {
             mMoviePage = savedInstanceState.getParcelable(MOVIE_PAGE);
             mAdapter.setData(mMoviePage);
@@ -126,9 +116,14 @@ public class MainActivityFragment extends Fragment {
 
     }
 
-    private void updateMoviesPage() {
+    private void updateMoviesPage(MoviePageSortType moviePageSortType) {
         final MovieService movieService = MovieService.getInstance();
-        final Observable<MoviePage> moviePageObservable = movieService.getPopularMovieFirstPage(TheMovieDb.APIKey);
+        final Observable<MoviePage> moviePageObservable;
+        if (moviePageSortType.equals(MoviePageSortType.highest_rated)) {
+            moviePageObservable = movieService.getHighestRatedMoviesFirstPage(TheMovieDb.APIKey);
+        } else {
+            moviePageObservable = movieService.getPopularMoviesFirstPage(TheMovieDb.APIKey);
+        }
         if (moviePageObservable == null) {
             Log.i("NJW", "retrofit observable=null; airplane mode etd?");
             return;
