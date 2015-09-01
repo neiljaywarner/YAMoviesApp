@@ -1,6 +1,7 @@
 package com.neiljaywarner.yamoviesapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -71,14 +72,14 @@ public class MainActivityFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_sort_popularity) {
-            updateMoviesPage(MoviePageSortType.most_popular);
             saveCurrentSortType(MoviePageSortType.most_popular);
+            updateMoviesPage(MoviePageSortType.most_popular);
             return true;
         }
 
         if (id == R.id.action_sort_rating) {
-            updateMoviesPage(MoviePageSortType.highest_rated);
             saveCurrentSortType(MoviePageSortType.highest_rated);
+            updateMoviesPage(MoviePageSortType.highest_rated);
             return true;
         }
 
@@ -97,7 +98,10 @@ public class MainActivityFragment extends Fragment {
     }
 
     private MoviePageSortType getCurrentSortType() {
-        String sortType = this.getActivity().getApplication().getSharedPreferences("yama", Context.MODE_PRIVATE).getString("sort_type", "");
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String sortType = sharedPref.getString("sort_type", MoviePageSortType.most_popular.toString());
+        Log.i("NJW", "current sortType=" + sortType);
+
         if (sortType.equals(MoviePageSortType.highest_rated.toString())) {
             return MoviePageSortType.highest_rated;
         } else {
@@ -106,7 +110,11 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void saveCurrentSortType(MoviePageSortType sortType) {
-        this.getActivity().getApplication().getSharedPreferences("yama", Context.MODE_PRIVATE).edit().putString("sort_type", sortType.toString()).commit();
+        Log.i("NJW", "Saving sort type=" + sortType.toString());
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("sort_type", sortType.toString());
+        editor.commit();
 
 
     }
@@ -128,7 +136,7 @@ public class MainActivityFragment extends Fragment {
         this.getActivity().setTitle(R.string.most_popular);
 
         if (savedInstanceState == null) {
-            updateMoviesPage(MoviePageSortType.most_popular); //TODO: Use sharedpreferences
+            updateMoviesPage();
         } else {
             mMoviePage = savedInstanceState.getParcelable(MOVIE_PAGE);
             mAdapter.setData(mMoviePage);
@@ -141,7 +149,13 @@ public class MainActivityFragment extends Fragment {
 
     private void updateMoviesPage(MoviePageSortType moviePageSortType) {
         final MovieService movieService = MovieService.getInstance();
-        this.getActivity().setTitle(moviePageSortType.toString());
+
+        if (moviePageSortType == MoviePageSortType.highest_rated) {
+            this.getActivity().setTitle(R.string.highest_rated);
+        } else {
+            this.getActivity().setTitle(R.string.most_popular);
+        }
+
         final Observable<MoviePage> moviePageObservable;
         if (moviePageSortType.equals(MoviePageSortType.highest_rated)) {
             moviePageObservable = movieService.getHighestRatedMoviesFirstPage(TheMovieDb.APIKey);
@@ -149,7 +163,7 @@ public class MainActivityFragment extends Fragment {
             moviePageObservable = movieService.getPopularMoviesFirstPage(TheMovieDb.APIKey);
         }
         if (moviePageObservable == null) {
-            Log.i("NJW", "retrofit observable=null; airplane mode etd?");
+            Log.i("NJW", "retrofit observable=null");
             return;
         }
         mCompositeSubscription.add(moviePageObservable
@@ -170,8 +184,7 @@ public class MainActivityFragment extends Fragment {
 
                             @Override
                             public void onNext(MoviePage moviePage) {
-                                Log.i("NJW", "we 'have' a moviepage->first movie=" +
-                                        moviePage.getMovie(0).getOriginalTitle());
+
                                 mMoviePage = moviePage;
                                 mAdapter.setData(mMoviePage);
                             }
