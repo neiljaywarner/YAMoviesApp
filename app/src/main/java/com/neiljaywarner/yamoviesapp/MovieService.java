@@ -9,16 +9,14 @@ import retrofit.http.GET;
 import retrofit.http.Query;
 import rx.Observable;
 
-/**
- * Created by neil on 8/28/15.
- */
+
 public class MovieService {
 
     private static MovieService sInstance = new MovieService();
     private static Observable<MoviePage> sHighestRatedMoviesFirstPage;
     private static Observable<MoviePage> sPopularMoviesFirstPage;
+    private static String sApiKey = TheMovieDb.APIKey;
 
-    private static Observable<MoviePage> sTopRatedMoviesFirstPage;
     private TheMovieDbMoviesService mMoviesWebService;
 
     private MovieService() {
@@ -36,18 +34,18 @@ public class MovieService {
         return sInstance;
     }
 
-    public Observable<MoviePage> getPopularMoviesFirstPage(String apiKey) {
+    public Observable<MoviePage> getPopularMoviesFirstPage() {
         Log.i("NJW", "get Observable in MovieService");
         if (sPopularMoviesFirstPage == null) {
-            sPopularMoviesFirstPage = mMoviesWebService.getPopularMoviesFirstPage(apiKey);
+            sPopularMoviesFirstPage = mMoviesWebService.getPopularMoviesFirstPage(sApiKey);
         }
         return sPopularMoviesFirstPage;
     }
 
-    public Observable<MoviePage> getHighestRatedMoviesFirstPage(String apiKey) {
+    public Observable<MoviePage> getHighestRatedMoviesFirstPage() {
         Log.i("NJW", "get Observable in MovieService");
         if (sHighestRatedMoviesFirstPage == null) {
-            sHighestRatedMoviesFirstPage = mMoviesWebService.getHighestRatedMoviesFirstPage(apiKey);
+            sHighestRatedMoviesFirstPage = mMoviesWebService.getHighestRatedMoviesFirstPage(sApiKey);
         }
         return sHighestRatedMoviesFirstPage;
     }

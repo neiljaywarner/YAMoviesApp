@@ -2,8 +2,6 @@ package com.neiljaywarner.yamoviesapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -31,6 +29,7 @@ public class MainActivityFragment extends Fragment {
     private static final int NUM_COLUMNS_GRIDVIEW = 2;
     private static final String TAG = MainActivityFragment.class.getSimpleName();
     private static final String MOVIE_PAGE = "MOVIE_PAGE";
+    private static final String PREF_SORT_TYPE = "sort_type";
 
 
     public MoviesRecyclerViewAdapter mAdapter;
@@ -56,7 +55,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.i("NJW", "View State Restored");
+        Log.i(TAG, "View State Restored");
     }
 
     @Override
@@ -99,8 +98,8 @@ public class MainActivityFragment extends Fragment {
 
     private MoviePageSortType getCurrentSortType() {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String sortType = sharedPref.getString("sort_type", MoviePageSortType.most_popular.toString());
-        Log.i("NJW", "current sortType=" + sortType);
+        String sortType = sharedPref.getString(PREF_SORT_TYPE, MoviePageSortType.most_popular.toString());
+        Log.i(TAG, "current sortType=" + sortType);
 
         if (sortType.equals(MoviePageSortType.highest_rated.toString())) {
             return MoviePageSortType.highest_rated;
@@ -110,11 +109,11 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void saveCurrentSortType(MoviePageSortType sortType) {
-        Log.i("NJW", "Saving sort type=" + sortType.toString());
+        Log.i(TAG, "Saving sort type=" + sortType.toString());
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("sort_type", sortType.toString());
-        editor.commit();
+        editor.putString(PREF_SORT_TYPE, sortType.toString());
+        editor.apply();
 
 
     }
@@ -158,12 +157,12 @@ public class MainActivityFragment extends Fragment {
 
         final Observable<MoviePage> moviePageObservable;
         if (moviePageSortType.equals(MoviePageSortType.highest_rated)) {
-            moviePageObservable = movieService.getHighestRatedMoviesFirstPage(TheMovieDb.APIKey);
+            moviePageObservable = movieService.getHighestRatedMoviesFirstPage();
         } else {
-            moviePageObservable = movieService.getPopularMoviesFirstPage(TheMovieDb.APIKey);
+            moviePageObservable = movieService.getPopularMoviesFirstPage();
         }
         if (moviePageObservable == null) {
-            Log.i("NJW", "retrofit observable=null");
+            Log.i(TAG, "retrofit observable=null");
             return;
         }
         mCompositeSubscription.add(moviePageObservable
@@ -172,12 +171,12 @@ public class MainActivityFragment extends Fragment {
                         .subscribe(new Subscriber<MoviePage>() {
                             @Override
                             public void onCompleted() {
-                                Log.i("NJW", "observable completed.");
+                                Log.i(TAG, "observable completed.");
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.i("NJW", "observable error;" + e.getMessage());
+                                Log.i(TAG, "observable error;" + e.getMessage());
                                 Toast.makeText(getActivity().getApplicationContext(), "..Please check internet connection and refresh.", Toast.LENGTH_LONG).show();
                                 //TODO: Strings.xml strings.
                             }
@@ -199,16 +198,6 @@ public class MainActivityFragment extends Fragment {
         super.onDestroyView();
     }
 
-    public boolean isOnline(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-
-        return isConnected;
-    }
 
 }
 
