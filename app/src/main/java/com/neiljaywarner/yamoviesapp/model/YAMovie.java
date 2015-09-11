@@ -19,6 +19,7 @@ public class YAMovie implements Parcelable {
     };
     public final String BASE_POSTER_PATH = "http://image.tmdb.org/t/p/";
     public final String POSTER_PATH_SIZE_STRING = "w185";
+    private int id;
     private String original_title;
     private String poster_path; //includes "/"
     private String overview;
@@ -30,12 +31,16 @@ public class YAMovie implements Parcelable {
 
 
     protected YAMovie(Parcel in) {
-
+        this.id = in.readInt();
         this.original_title = in.readString();
         this.poster_path = in.readString();
         this.overview = in.readString();
         this.release_date = in.readString();
         this.vote_average = in.readFloat();
+    }
+
+    public int getId() {
+        return this.id;
     }
 
     public String getPosterFullUrl() {
@@ -74,6 +79,7 @@ public class YAMovie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
         dest.writeString(this.original_title);
         dest.writeString(this.poster_path);
         dest.writeString(this.overview);

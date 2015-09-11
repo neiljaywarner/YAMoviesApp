@@ -4,13 +4,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.neiljaywarner.yamoviesapp.model.RelatedVideo;
+import com.neiljaywarner.yamoviesapp.model.VideosList;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
 import com.neiljaywarner.yamoviesapp.view.YoutubeThumbnailView;
 import com.squareup.picasso.Callback;
@@ -18,14 +21,26 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 
 public class MovieDetailActivityFragment extends Fragment {
 
+    private static final String TAG = MovieDetailActivityFragment.class.getSimpleName();
     TextView mTextViewTitle, mTextViewYear, mTextViewVoteAverage, mTextViewOverview;
 
     @Bind(R.id.viewGroupTrailers)
     ViewGroup viewGroupRelatedVideos;
+
+    private VideosList mVideosList;
+
+
+    private CompositeSubscription mCompositeSubscription;
+
     public MovieDetailActivityFragment() {
     }
 
@@ -47,12 +62,14 @@ public class MovieDetailActivityFragment extends Fragment {
 
         mTextViewTitle.setText(movie.getOriginalTitle());
 
+        mCompositeSubscription = new CompositeSubscription();
+
 
         Picasso.with(getContext()).load(movie.getPosterFullUrl())
                 .into(imageViewThumbnail, new Callback.EmptyCallback() {
                     @Override
                     public void onSuccess() {
-                        loadDetailText(movie);
+                        loadDetails(movie);
                         //  Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap(); // Ew!
                         //  Palette palette = PaletteTransformation.getPalette(bitmap);
                         // TODO apply palette to text views, backgrounds, etc.
@@ -62,7 +79,8 @@ public class MovieDetailActivityFragment extends Fragment {
 
                     @Override
                     public void onError() {
-                        loadDetailText(movie);
+                        loadDetails(movie);
+                        updateRelatedVideosList(movie.getId());
                     }
                 });
 
@@ -74,18 +92,26 @@ public class MovieDetailActivityFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+        mCompositeSubscription.unsubscribe();
+    }
+
     /**
      * Loads detail info into UI.
      *
      * @param movie
      */
-    private void loadDetailText(YAMovie movie) {
+    private void loadDetails(YAMovie movie) {
         mTextViewYear.setText(movie.getYear());
         mTextViewVoteAverage.setText(movie.getVoteAverage() + "/10");//TODO: Code cleanup here.
         mTextViewOverview.setText(movie.getOverview());
 
-        View viewTrailer = getCustomTrailerView(RelatedVideo.getTestVideo()); //TODO: Custom View
-        viewGroupRelatedVideos.addView(viewTrailer);
+        updateRelatedVideosList(movie.getId());
+
+
     }
 
     //TODO:  custom view with bound data like in dan lew tut. tried android data, didnt' work yet.
@@ -114,6 +140,12 @@ public class MovieDetailActivityFragment extends Fragment {
         return relatedVideoView;
     }
 
+    private void updateRelatedVideosViews(VideosList videosList) {
+        RelatedVideo video = videosList.getVideos().get(0);
+        View viewTrailer = getCustomTrailerView(video);
+        viewGroupRelatedVideos.addView(viewTrailer);
+    }
+
 
     /// TODO: Consider moving this code to RelatedVideo.java
 
@@ -122,6 +154,47 @@ public class MovieDetailActivityFragment extends Fragment {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + relatedVideo.getKey()));
         startActivity(i);
     }
+
+
+    private void updateRelatedVideosList(int movieId) {
+        final MovieService movieService = MovieService.getInstance();
+
+
+        final Observable<VideosList> videosListObservable;
+
+        videosListObservable = movieService.getVideosList(movieId);
+
+        if (videosListObservable == null) {
+            Log.i(TAG, "retrofit observable=null");
+            return;
+        }
+        mCompositeSubscription.add(videosListObservable
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<VideosList>() {
+                            @Override
+                            public void onCompleted() {
+                                Log.i(TAG, "observable completed.");
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.i(TAG, "observable error;" + e.getMessage());
+                                Toast.makeText(getActivity().getApplicationContext(), "..Please check internet connection and refresh.", Toast.LENGTH_LONG).show();
+                                //TODO: Strings.xml strings.
+                            }
+
+                            @Override
+                            public void onNext(VideosList videosList) {
+                                mVideosList = videosList;
+                                updateRelatedVideosViews(mVideosList);
+                            }
+                        })
+        );
+
+    }
+
+
 
 
 }

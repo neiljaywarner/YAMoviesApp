@@ -29,6 +29,7 @@ public class YoutubeThumbnailView extends LinearLayout {
 
         LayoutInflater.from(context).inflate(R.layout.video_thumbnail_merge, this);
         mIconView = (ImageView) findViewById(R.id.icon);
+        //TODO: Use placeholder and error icons.
         mNameView = (TextView) findViewById(R.id.name);
     }
 

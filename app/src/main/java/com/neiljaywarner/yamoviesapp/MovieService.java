@@ -3,9 +3,11 @@ package com.neiljaywarner.yamoviesapp;
 import android.util.Log;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
+import com.neiljaywarner.yamoviesapp.model.VideosList;
 
 import retrofit.RestAdapter;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
@@ -15,6 +17,8 @@ public class MovieService {
     private static MovieService sInstance = new MovieService();
     private static Observable<MoviePage> sHighestRatedMoviesFirstPage;
     private static Observable<MoviePage> sPopularMoviesFirstPage;
+    private static Observable<VideosList> sVideosList;
+
     private static String sApiKey = TheMovieDb.APIKey;
 
     private TheMovieDbMoviesService mMoviesWebService;
@@ -42,12 +46,21 @@ public class MovieService {
         return sPopularMoviesFirstPage;
     }
 
+
     public Observable<MoviePage> getHighestRatedMoviesFirstPage() {
         Log.i("NJW", "get Observable in MovieService");
         if (sHighestRatedMoviesFirstPage == null) {
             sHighestRatedMoviesFirstPage = mMoviesWebService.getHighestRatedMoviesFirstPage(sApiKey);
         }
         return sHighestRatedMoviesFirstPage;
+    }
+
+    public Observable<VideosList> getVideosList(int movieId) {
+        Log.i("NJW", "get VideosList Observable in MovieService");
+        if (sVideosList == null) {
+            sVideosList = mMoviesWebService.getVideosList(movieId, sApiKey);
+        }
+        return sVideosList;
     }
 
     /**
@@ -60,6 +73,9 @@ public class MovieService {
         @GET("/3/discover/movie?sort_by=vote_average.desc&page=1")
         Observable<MoviePage> getHighestRatedMoviesFirstPage(@Query("api_key") String apiKey);
 
+        @GET("/3/movie/{id}/videos")
+        Observable<VideosList> getVideosList(@Path("id") int movieId, @Query("api_key") String apiKey);
+        //e.g. http://api.themoviedb.org/3/movie/131631/videos?api_key=blahblah
 
     }
 
