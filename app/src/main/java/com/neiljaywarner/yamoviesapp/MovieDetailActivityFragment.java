@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.neiljaywarner.yamoviesapp.model.RelatedVideo;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
+import com.neiljaywarner.yamoviesapp.view.YoutubeThumbnailView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -83,7 +84,7 @@ public class MovieDetailActivityFragment extends Fragment {
         mTextViewVoteAverage.setText(movie.getVoteAverage() + "/10");//TODO: Code cleanup here.
         mTextViewOverview.setText(movie.getOverview());
 
-        View viewTrailer = getTrailerView(RelatedVideo.getTestVideo()); //TODO: Custom View
+        View viewTrailer = getCustomTrailerView(RelatedVideo.getTestVideo()); //TODO: Custom View
         viewGroupRelatedVideos.addView(viewTrailer);
     }
 
@@ -99,6 +100,20 @@ public class MovieDetailActivityFragment extends Fragment {
         });
         return tv;
     }
+
+    //TODO:  custom view with bound data like in dan lew tut. tried android data, didnt' work yet.
+    public View getCustomTrailerView(final RelatedVideo relatedVideo) {
+        YoutubeThumbnailView relatedVideoView = new YoutubeThumbnailView(this.getActivity());
+        relatedVideoView.bind(relatedVideo);
+        relatedVideoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openInYoutube(relatedVideo);
+            }
+        });
+        return relatedVideoView;
+    }
+
 
     /// TODO: Consider moving this code to RelatedVideo.java
 

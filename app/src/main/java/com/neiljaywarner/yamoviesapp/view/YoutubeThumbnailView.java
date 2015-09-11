@@ -24,8 +24,8 @@ public class YoutubeThumbnailView extends LinearLayout {
     public YoutubeThumbnailView(Context context) {
         super(context);
 
-        setOrientation(LinearLayout.VERTICAL);
-        setGravity(Gravity.CENTER);
+        setOrientation(LinearLayout.HORIZONTAL);
+        setGravity(Gravity.LEFT);
 
         LayoutInflater.from(context).inflate(R.layout.video_thumbnail_merge, this);
         mIconView = (ImageView) findViewById(R.id.icon);
