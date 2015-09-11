@@ -17,7 +17,6 @@ public class MovieService {
     private static MovieService sInstance = new MovieService();
     private static Observable<MoviePage> sHighestRatedMoviesFirstPage;
     private static Observable<MoviePage> sPopularMoviesFirstPage;
-    private static Observable<VideosList> sVideosList;
 
     private static String sApiKey = TheMovieDb.APIKey;
 
@@ -57,10 +56,8 @@ public class MovieService {
 
     public Observable<VideosList> getVideosList(int movieId) {
         Log.i("NJW", "get VideosList Observable in MovieService");
-        if (sVideosList == null) {
-            sVideosList = mMoviesWebService.getVideosList(movieId, sApiKey);
-        }
-        return sVideosList;
+
+        return mMoviesWebService.getVideosList(movieId, sApiKey);
     }
 
     /**
