@@ -127,7 +127,6 @@ public class MovieDetailActivityFragment extends Fragment {
         return tv;
     }
 
-    //TODO:  custom view with bound data like in dan lew tut. tried android data, didnt' work yet.
     public View getCustomTrailerView(final RelatedVideo relatedVideo) {
         YoutubeThumbnailView relatedVideoView = new YoutubeThumbnailView(this.getActivity());
         relatedVideoView.bind(relatedVideo);
@@ -141,9 +140,13 @@ public class MovieDetailActivityFragment extends Fragment {
     }
 
     private void updateRelatedVideosViews(VideosList videosList) {
-        RelatedVideo video = videosList.getVideos().get(0);
-        View viewTrailer = getCustomTrailerView(video);
-        viewGroupRelatedVideos.addView(viewTrailer);
+        RelatedVideo video;
+        for (int i = 0; i < videosList.getVideos().size(); i++) {
+            video = videosList.getVideos().get(i);
+            View viewTrailer = getCustomTrailerView(video);
+            viewGroupRelatedVideos.addView(viewTrailer);
+        }
+
     }
 
 
