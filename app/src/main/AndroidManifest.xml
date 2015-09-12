@@ -28,6 +28,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.neiljaywarner.yamoviesapp.MainActivity" />
         </activity>
+
+        <activity
+            android:name=".ReviewsActivity"
+            android:label="@string/title_activity_movie_detail"
+            android:launchMode="singleTop"
+            android:theme="@style/Animation.AppCompat.Dialog">
+
+        </activity>
     </application>
 
 </manifest>

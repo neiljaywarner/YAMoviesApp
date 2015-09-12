@@ -75,6 +75,25 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
             }
         });
 
+        holder.imageViewPoster.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                gotoReviewScreen(v.getContext(), movie);
+                return true;
+            }
+        });
+
+    }
+
+    /**
+     * Show reviews Activity (dialog) for this movie.
+     *
+     * @param context
+     * @param movie
+     */
+    private void gotoReviewScreen(Context context, YAMovie movie) {
+        //  Snackbar.
+        context.startActivity(ReviewsActivity.newIntent(context, movie));
     }
 
     /**
@@ -86,6 +105,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
         context.startActivity(intent);
     }
+    //TODO: MOve to newIntent pattern or similar as in ReviewsActivity - this class should not need to know about EXTRA_MOVIE and how to assemble intent
 
     @Override
     public int getItemCount() {

@@ -3,6 +3,7 @@ package com.neiljaywarner.yamoviesapp;
 import android.util.Log;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
+import com.neiljaywarner.yamoviesapp.model.ReviewsList;
 import com.neiljaywarner.yamoviesapp.model.VideosList;
 
 import retrofit.RestAdapter;
@@ -60,6 +61,13 @@ public class MovieService {
         return mMoviesWebService.getVideosList(movieId, sApiKey);
     }
 
+    public Observable<ReviewsList> getReviewsList(int movieId) {
+        Log.i("NJW", "get ReviewsList Observable in MovieService");
+
+        return mMoviesWebService.getReviewsList(movieId, sApiKey);
+
+    }
+
     /**
      * http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=api_key&page=2
      */
@@ -73,6 +81,10 @@ public class MovieService {
         @GET("/3/movie/{id}/videos")
         Observable<VideosList> getVideosList(@Path("id") int movieId, @Query("api_key") String apiKey);
         //e.g. http://api.themoviedb.org/3/movie/131631/videos?api_key=blahblah
+
+        @GET("/3/movie/{id}/reviews")
+        Observable<ReviewsList> getReviewsList(@Path("id") int movieId, @Query("api_key") String apiKey);
+        //e.g. http://api.themoviedb.org/3/movie/131631/reviews?api_key=blahblah
 
     }
 
