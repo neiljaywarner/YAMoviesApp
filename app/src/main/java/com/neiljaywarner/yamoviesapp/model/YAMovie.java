@@ -3,6 +3,8 @@ package com.neiljaywarner.yamoviesapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+
 /**
  * Created by neil on 8/19/15.
  */
@@ -29,7 +31,6 @@ public class YAMovie implements Parcelable {
     public YAMovie() {
     }
 
-
     protected YAMovie(Parcel in) {
         this.id = in.readInt();
         this.original_title = in.readString();
@@ -37,6 +38,11 @@ public class YAMovie implements Parcelable {
         this.overview = in.readString();
         this.release_date = in.readString();
         this.vote_average = in.readFloat();
+    }
+
+    public static YAMovie newMovieFromJson(String json) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, YAMovie.class);
     }
 
     public int getId() {
@@ -86,4 +92,6 @@ public class YAMovie implements Parcelable {
         dest.writeString(this.release_date);
         dest.writeFloat(this.vote_average);
     }
+
+
 }

@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     tools:context="com.neiljaywarner.yamoviesapp.MovieDetailActivityFragment">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,6 +17,17 @@
             android:background="@android:color/holo_green_light"
             android:padding="@dimen/activity_horizontal_margin"
             android:textSize="45sp" />
+
+        <ImageView
+            android:id="@+id/imageViewFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+
+            android:src="@android:drawable/star_big_off" />
 
 
         <!-- TODO: make dimens values that handles low res devices and high res devices so long titles dont' end up several lines etc-->

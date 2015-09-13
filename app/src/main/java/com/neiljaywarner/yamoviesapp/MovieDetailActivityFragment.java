@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,16 +37,25 @@ import rx.subscriptions.CompositeSubscription;
 public class MovieDetailActivityFragment extends Fragment {
 
     private static final String TAG = MovieDetailActivityFragment.class.getSimpleName();
-    public YAMovie mMovie;
-    TextView mTextViewTitle, mTextViewYear, mTextViewOverview;
+    YAMApplication mApp;
     @Bind(R.id.viewGroupTrailers)
     ViewGroup viewGroupRelatedVideos;
     @Bind(R.id.buttonReviews)
     Button mButtonReviews;
+    @Bind(R.id.imageViewFavorite)
+    ImageView mImageViewFavorite;
+    private YAMovie mMovie;
+    private TextView mTextViewTitle, mTextViewYear, mTextViewOverview;
     private VideosList mVideosList;
     private CompositeSubscription mCompositeSubscription;
 
     public MovieDetailActivityFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mApp = (YAMApplication) getActivity().getApplication();
     }
 
     @Override
@@ -61,18 +71,18 @@ public class MovieDetailActivityFragment extends Fragment {
         mTextViewOverview = (TextView) root.findViewById(R.id.textViewOverview);
 
 
-        final YAMovie movie = (YAMovie) this.getActivity().getIntent().getExtras().get(MovieDetailActivity.EXTRA_MOVIE);
+        mMovie = (YAMovie) this.getActivity().getIntent().getExtras().get(MovieDetailActivity.EXTRA_MOVIE);
 
-        mTextViewTitle.setText(movie.getOriginalTitle());
+        mTextViewTitle.setText(mMovie.getOriginalTitle());
 
         mCompositeSubscription = new CompositeSubscription();
 
 
-        Picasso.with(getContext()).load(movie.getPosterFullUrl())
+        Picasso.with(getContext()).load(mMovie.getPosterFullUrl())
                 .into(imageViewThumbnail, new Callback.EmptyCallback() {
                     @Override
                     public void onSuccess() {
-                        loadDetails(movie);
+                        loadDetails(mMovie);
                         //  Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap(); // Ew!
                         //  Palette palette = PaletteTransformation.getPalette(bitmap);
                         // TODO apply palette to text views, backgrounds, etc.
@@ -82,8 +92,8 @@ public class MovieDetailActivityFragment extends Fragment {
 
                     @Override
                     public void onError() {
-                        loadDetails(movie);
-                        updateRelatedVideosList(movie.getId());
+                        loadDetails(mMovie);
+                        updateRelatedVideosList(mMovie.getId());
                     }
                 });
 
@@ -95,7 +105,7 @@ public class MovieDetailActivityFragment extends Fragment {
         mButtonReviews.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showReviewsDialog(v.getContext(), movie);
+                showReviewsDialog(v.getContext(), mMovie);
             }
         });
 
@@ -131,6 +141,23 @@ public class MovieDetailActivityFragment extends Fragment {
         mTextViewOverview.setText(movie.getOverview());
 
         updateRelatedVideosList(movie.getId());
+
+        if (mApp.isFavorite(movie)) {
+            this.getActivity().setTitle("favorite");
+            mImageViewFavorite.setImageResource(android.R.drawable.star_big_on);
+        } else {
+            this.getActivity().setTitle("NOTfavorite");
+
+            mImageViewFavorite.setImageResource(android.R.drawable.star_big_off);
+        }
+
+        mImageViewFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleFavorite();
+            }
+        });
+
 
 
     }
@@ -222,7 +249,8 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_movie_detail, menu);
+        //TODO: Remove if it moves to detail screen on tablet for consistency.
     }
 
     @Override
@@ -232,12 +260,31 @@ public class MovieDetailActivityFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_favorite) {
-            saveFavorite(this.getActivity(), mMovie);
+            if (mApp.isFavorite(mMovie)) {
+                mApp.removeFavorite(mMovie);
+            } else {
+                mApp.saveFavorite(mMovie);
+            }
+
+            //TODO: Move to bar with actual movie title and toggle star.
+
             return true;
         }
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleFavorite() {
+        if (mApp.isFavorite(mMovie)) {
+            mApp.removeFavorite(mMovie);
+            mImageViewFavorite.setImageResource(android.R.drawable.star_big_off);
+            Toast.makeText(this.getActivity(), "Removed '" + mMovie.getOriginalTitle() + "' as favorite", Toast.LENGTH_LONG).show();
+        } else {
+            mApp.saveFavorite(mMovie);
+            mImageViewFavorite.setImageResource(android.R.drawable.star_big_on);
+            Toast.makeText(this.getActivity(), "Saved '" + mMovie.getOriginalTitle() + "' as favorite", Toast.LENGTH_LONG).show();
+        }
     }
 
 
