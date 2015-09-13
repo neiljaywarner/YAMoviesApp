@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.neiljaywarner.yamoviesapp.model.MoviePage;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
 import com.squareup.picasso.Picasso;
 
@@ -26,11 +25,12 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     private List<YAMovie> movies = new ArrayList<>();
 
 
-    public void setData(MoviePage moviePage) {
-        if (moviePage != null) {
-            movies = moviePage.getMovies();
-            this.notifyDataSetChanged();
-        }
+    public void setData(List<YAMovie> movies) {
+
+        this.movies = movies;
+
+        this.notifyDataSetChanged();
+
     }
     @Override
     public MoviesRecyclerViewAdapter.MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

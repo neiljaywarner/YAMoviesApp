@@ -138,7 +138,7 @@ public class MainActivityFragment extends Fragment {
             updateMoviesPage();
         } else {
             mMoviePage = savedInstanceState.getParcelable(MOVIE_PAGE);
-            mAdapter.setData(mMoviePage);
+            mAdapter.setData(mMoviePage.getMovies());
 
         }
 
@@ -185,7 +185,7 @@ public class MainActivityFragment extends Fragment {
                             public void onNext(MoviePage moviePage) {
 
                                 mMoviePage = moviePage;
-                                mAdapter.setData(mMoviePage);
+                                mAdapter.setData(mMoviePage.getMovies());
                             }
                         })
         );
