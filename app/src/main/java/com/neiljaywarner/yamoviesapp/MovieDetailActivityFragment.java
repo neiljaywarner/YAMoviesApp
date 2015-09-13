@@ -143,11 +143,8 @@ public class MovieDetailActivityFragment extends Fragment {
         updateRelatedVideosList(movie.getId());
 
         if (mApp.isFavorite(movie)) {
-            this.getActivity().setTitle("favorite");
             mImageViewFavorite.setImageResource(android.R.drawable.star_big_on);
         } else {
-            this.getActivity().setTitle("NOTfavorite");
-
             mImageViewFavorite.setImageResource(android.R.drawable.star_big_off);
         }
 

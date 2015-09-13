@@ -19,13 +19,14 @@ public class YAMApplication extends Application {
 
     private static final String PREFS_NAME = "yama_prefs";
     private static final String FAVORITES_LIST_STRING = "favorites_list_string";
+    private static final String TAG = YAMApplication.class.getSimpleName();
     private String mFavoritesListString;
     private List<YAMovie> mFavoriteMovies = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("NJW", "app onCreate()");
+        Log.i(TAG, "app onCreate()");
         mFavoritesListString = loadFavoritesListString(); //initializing/loading string from prefs.
         mFavoriteMovies = getFavorites();
     }
@@ -59,13 +60,11 @@ public class YAMApplication extends Application {
      */
     private String loadFavoritesListString() {
         String csvString = getStringPreference(FAVORITES_LIST_STRING);
-        Log.i("NJW", "-->Getting favorites list String:'" + csvString);
         mFavoritesListString = csvString;
         return csvString;
     }
 
     private void saveFavoritesListString(String csvString) {
-        Log.i("NJW", "-->Saving favorites list String:'" + csvString);
         mFavoritesListString = csvString;
         saveSharedPreference(FAVORITES_LIST_STRING, csvString);
     }
@@ -76,17 +75,14 @@ public class YAMApplication extends Application {
      * @param movies
      */
     private void saveFavoritesList(List<YAMovie> movies) {
-        Log.i("NJW", "About to save favorites list, size:" + movies.size());
         String favoritesListString = "";
         for (YAMovie movie : movies) {
             favoritesListString += movie.getId() + ",";
         }
 
-        Log.i("NJW", "favoritesListString='" + favoritesListString + "'");
         if (movies.size() > 0) {
             favoritesListString = favoritesListString.substring(0, favoritesListString.length() - 1);
         }
-        Log.i("NJW", "favoritesListString='" + favoritesListString + "'");
 
         saveFavoritesListString(favoritesListString);
     }
@@ -95,14 +91,12 @@ public class YAMApplication extends Application {
     private void saveSharedPreference(String prefKey, String prefString) {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         sharedPreferences.edit().putString(prefKey, prefString);
-        Log.i("NJW", "Savign " + prefKey + "/'" + prefString + "'");
         sharedPreferences.edit().commit();
     }
 
     private String getStringPreference(String prefKey) {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String prefString = sharedPreferences.getString(prefKey, "");
-        Log.i("NJW", "gettign " + prefKey + "/" + prefString);
 
         return prefString;
     }
@@ -127,9 +121,7 @@ public class YAMApplication extends Application {
     }
 
     public void removeFavorite(YAMovie movie) {
-        Log.i("NJW", "About to remove from list size:" + mFavoriteMovies.size());
         mFavoriteMovies.remove(movie);
-        Log.i("NJW", "List now size:" + mFavoriteMovies.size());
 
         saveFavoritesList(mFavoriteMovies);
     }
@@ -138,9 +130,7 @@ public class YAMApplication extends Application {
         if (mFavoriteMovies == null || mFavoriteMovies.isEmpty()) {
             return false;
         }
-        Log.i("NJW", "Looking for:" + movie.getId());
         String testString = "," + mFavoritesListString + ",";
-        Log.i("NJW", "in " + testString);
         return testString.contains("," + movie.getId() + ",");
     }
 
