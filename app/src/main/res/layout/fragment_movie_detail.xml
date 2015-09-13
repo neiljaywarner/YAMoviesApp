@@ -46,15 +46,17 @@
                 android:id="@+id/textViewDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="120min"
                 android:textSize="22sp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:text="120min" />
 
             <!-- Duration is in the mockup but not the json or the rubric -->
-            <TextView
-                android:id="@+id/textViewVoteAverage"
+            <Button
+                android:id="@+id/buttonReviews"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                tools:text="8.0/10" />
+            <!-- reviews and vote average -->
         </LinearLayout>
 
         <TextView
@@ -62,7 +64,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/imageViewThumbnail"
-            android:layout_margin="@dimen/activity_horizontal_margin" />
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            tools:text="This is where the overview goes" />
 
         <LinearLayout
             android:id="@+id/viewGroupTrailers"

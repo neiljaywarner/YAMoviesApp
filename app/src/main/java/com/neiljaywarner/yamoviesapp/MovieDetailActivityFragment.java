@@ -1,5 +1,6 @@
 package com.neiljaywarner.yamoviesapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,10 +33,13 @@ import rx.subscriptions.CompositeSubscription;
 public class MovieDetailActivityFragment extends Fragment {
 
     private static final String TAG = MovieDetailActivityFragment.class.getSimpleName();
-    TextView mTextViewTitle, mTextViewYear, mTextViewVoteAverage, mTextViewOverview;
+    TextView mTextViewTitle, mTextViewYear, mTextViewOverview;
 
     @Bind(R.id.viewGroupTrailers)
     ViewGroup viewGroupRelatedVideos;
+
+    @Bind(R.id.buttonReviews)
+    Button mButtonReviews;
 
     private VideosList mVideosList;
 
@@ -54,7 +59,6 @@ public class MovieDetailActivityFragment extends Fragment {
         ImageView imageViewThumbnail = (ImageView) root.findViewById(R.id.imageViewThumbnail);
         mTextViewTitle = (TextView) root.findViewById(R.id.textViewTitle);
         mTextViewYear = (TextView) root.findViewById(R.id.textViewYear);
-        mTextViewVoteAverage = (TextView) root.findViewById(R.id.textViewVoteAverage);
         mTextViewOverview = (TextView) root.findViewById(R.id.textViewOverview);
 
 
@@ -89,7 +93,25 @@ public class MovieDetailActivityFragment extends Fragment {
 
         //TODO: Cool activity transitions and get background color from pallette in picture; but I want to make sure I turn it in on time
 
+        mButtonReviews.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showReviewsDialog(v.getContext(), movie);
+            }
+        });
+
         return root;
+    }
+
+    /**
+     * Show reviews Activity (dialog) for this movie.
+     *
+     * @param context
+     * @param movie
+     */
+    private void showReviewsDialog(Context context, YAMovie movie) {
+        //  Snackbar.
+        context.startActivity(ReviewsActivity.newIntent(context, movie));
     }
 
     @Override
@@ -106,7 +128,7 @@ public class MovieDetailActivityFragment extends Fragment {
      */
     private void loadDetails(YAMovie movie) {
         mTextViewYear.setText(movie.getYear());
-        mTextViewVoteAverage.setText(movie.getVoteAverage() + "/10");//TODO: Code cleanup here.
+        mButtonReviews.setText(movie.getVoteAverage() + "/10");//TODO: Code cleanup here.
         mTextViewOverview.setText(movie.getOverview());
 
         updateRelatedVideosList(movie.getId());

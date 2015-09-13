@@ -33,7 +33,7 @@
             android:name=".ReviewsActivity"
             android:label="@string/title_activity_movie_detail"
             android:launchMode="singleTop"
-            android:theme="@style/Animation.AppCompat.Dialog">
+            android:theme="@style/Base.V7.Theme.AppCompat.Dialog">
 
         </activity>
     </application>

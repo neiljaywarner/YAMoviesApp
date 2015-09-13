@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.neiljaywarner.yamoviesapp.model.ReviewsList;
@@ -30,6 +31,7 @@ public class ReviewsActivity extends Activity {
 
     private CompositeSubscription mCompositeSubscription;
     private ReviewsRecyclerViewAdapter mAdapter;
+    private View mEmptyView;
 
     /**
      * Convenience method so you can start this activity properly.
@@ -39,7 +41,6 @@ public class ReviewsActivity extends Activity {
      */
     public static Intent newIntent(Context context, YAMovie movie) {
         Intent intent = new Intent(context, ReviewsActivity.class);
-
         intent.putExtra(ReviewsActivity.EXTRA_MOVIE, movie);
         return intent;
     }
@@ -58,10 +59,18 @@ public class ReviewsActivity extends Activity {
 
         recyclerView.setAdapter(mAdapter);
         final YAMovie movie = (YAMovie) getIntent().getExtras().get(EXTRA_MOVIE);
+
+        this.setTitle(movie.getOriginalTitle());
         Log.i("NJW", "in ReviewsActivity onCreate about to load/update reviews for '" + movie.getOriginalTitle());
         updateReviewsList(movie.getId());
 
-        //TODO: Next make reviews in a dialog themed activity, i saw someone else do that and it seems like it will work in their demo they posted.
+        mEmptyView = findViewById(android.R.id.empty);
+        (findViewById(R.id.closeButton)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ReviewsActivity.this.finish();
+            }
+        });
         // TODO: 3 lines...https://github.com/twotoasters/JazzyListView/blob/master/sample/src/main/java/com/twotoasters/jazzylistview/sample/RecyclerViewActivity.java
     }
 
@@ -70,7 +79,6 @@ public class ReviewsActivity extends Activity {
 
     private void updateReviewsList(int movieId) {
         final MovieService movieService = MovieService.getInstance();
-
 
         final Observable<ReviewsList> reviewsListObservable;
 
@@ -100,6 +108,12 @@ public class ReviewsActivity extends Activity {
                             public void onNext(ReviewsList videosList) {
                                 mReviewsList = videosList;
                                 mAdapter.setData(mReviewsList);
+
+                                if (mReviewsList.getResults().size() == 0) {
+                                    mEmptyView.setVisibility(View.VISIBLE);
+                                } else {
+                                    mEmptyView.setVisibility(View.GONE);
+                                }
                             }
                         })
         );
