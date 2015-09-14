@@ -61,7 +61,7 @@ public class ReviewsActivity extends Activity {
         final YAMovie movie = (YAMovie) getIntent().getExtras().get(EXTRA_MOVIE);
 
         this.setTitle(movie.getOriginalTitle());
-        Log.i("NJW", "in ReviewsActivity onCreate about to load/update reviews for '" + movie.getOriginalTitle());
+        Log.i(TAG, "in ReviewsActivity onCreate about to load/update reviews for '" + movie.getOriginalTitle());
         updateReviewsList(movie.getId());
 
         mEmptyView = findViewById(android.R.id.empty);
@@ -120,5 +120,9 @@ public class ReviewsActivity extends Activity {
 
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mCompositeSubscription.unsubscribe();
+    }
 }

@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -134,7 +135,14 @@ public class YAMApplication extends Application {
     }
 
     public void removeFavorite(YAMovie movie) {
-        mFavoriteMovies.remove(movie);
+        Iterator<YAMovie> iterator = mFavoriteMovies.iterator();
+
+        while (iterator.hasNext()) {
+            YAMovie currentMovie = iterator.next();
+            if (movie.getId() == currentMovie.getId()) {
+                iterator.remove();
+            } //TODO: Overload .equals and .hashCode in YAMovie
+        }
 
         saveFavoritesList(mFavoriteMovies);
     }

@@ -33,9 +33,8 @@ public class MainActivityFragment extends Fragment {
     private static final String TAG = MainActivityFragment.class.getSimpleName();
     private static final String MOVIE_PAGE = "MOVIE_PAGE";
     private static final String PREF_SORT_TYPE = "sort_type";
-
-
     public MoviesRecyclerViewAdapter mAdapter;
+    private List<YAMovie> mFavoriteMovies;
     private CompositeSubscription mCompositeSubscription;
     private MoviePage mMoviePage;
 
@@ -46,6 +45,8 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        YAMApplication app = (YAMApplication) getActivity().getApplication();
+        mFavoriteMovies = app.getFavorites();
     }
 
     //TODO: Consider rx 'replay' operator instead?
@@ -65,6 +66,13 @@ public class MainActivityFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem item = menu.findItem(R.id.action_favorites);
+        if (mFavoriteMovies == null || mFavoriteMovies.isEmpty()) {
+            item.setVisible(false);
+        } else {
+            item.setVisible(true);
+        }
     }
 
     @Override
@@ -100,10 +108,12 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Show favorites.
+     * TODO: Clean up this logic - should favorites be like a sort type that saves when you exit?
+     */
     private void updateMoviesPageWithFavorites() {
-        YAMApplication app = (YAMApplication) getActivity().getApplication();
-        List<YAMovie> favoriteMovies = app.getFavorites();
-        mAdapter.setData(favoriteMovies);
+        mAdapter.setData(mFavoriteMovies);
     }
     private void updateMoviesPage() {
         updateMoviesPage(getCurrentSortType());
