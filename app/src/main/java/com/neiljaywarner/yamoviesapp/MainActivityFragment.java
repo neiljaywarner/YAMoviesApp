@@ -18,6 +18,8 @@ import android.widget.Toast;
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
 
+import org.lucasr.twowayview.ItemSelectionSupport;
+
 import java.util.List;
 
 import rx.Observable;
@@ -37,6 +39,7 @@ public class MainActivityFragment extends Fragment {
     private List<YAMovie> mFavoriteMovies;
     private CompositeSubscription mCompositeSubscription;
     private MoviePage mMoviePage;
+    private ItemSelectionSupport mItemSelectionSupport;
 
     public MainActivityFragment() {
     }
@@ -150,7 +153,11 @@ public class MainActivityFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
-        mAdapter = new MoviesRecyclerViewAdapter(((MainActivity) this.getActivity()));
+
+        mItemSelectionSupport = ItemSelectionSupport.addTo(recyclerView);
+        mItemSelectionSupport.setChoiceMode(ItemSelectionSupport.ChoiceMode.SINGLE);
+
+        mAdapter = new MoviesRecyclerViewAdapter(((MainActivity) this.getActivity()), mItemSelectionSupport);
 
         mCompositeSubscription = new CompositeSubscription();
 

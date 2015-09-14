@@ -29,5 +29,7 @@ dependencies {
 
     compile 'com.jakewharton:butterknife:7.0.1'
 
-
+    //below is just for selectable part - bummer.
+    compile 'org.lucasr.twowayview:core:1.0.0-SNAPSHOT@aar'
+    compile 'org.lucasr.twowayview:layouts:1.0.0-SNAPSHOT@aar'
 }

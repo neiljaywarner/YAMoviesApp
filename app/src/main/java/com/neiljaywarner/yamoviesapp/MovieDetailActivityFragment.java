@@ -50,6 +50,8 @@ public class MovieDetailActivityFragment extends Fragment {
     private VideosList mVideosList;
     private CompositeSubscription mCompositeSubscription;
 
+    private boolean mTwoPane;
+
     public MovieDetailActivityFragment() {
     }
 
@@ -62,9 +64,11 @@ public class MovieDetailActivityFragment extends Fragment {
         if (getArguments() != null && getArguments().containsKey(ARG_MOVIE)) {
             mMovie = getArguments().getParcelable(ARG_MOVIE);
             this.getActivity().setTitle(mMovie.getOriginalTitle());
+            mTwoPane = true;
         } else {
             MovieDetailActivity movieDetailActivity = (MovieDetailActivity) getActivity();
             mMovie = movieDetailActivity.getMovie();
+            mTwoPane = false;
         }
 
     }

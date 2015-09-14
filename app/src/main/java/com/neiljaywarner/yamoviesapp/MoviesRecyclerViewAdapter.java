@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import com.neiljaywarner.yamoviesapp.model.YAMovie;
 import com.squareup.picasso.Picasso;
 
+import org.lucasr.twowayview.ItemSelectionSupport;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +23,14 @@ import java.util.List;
  */
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.MovieViewHolder> {
 
+    private final ItemSelectionSupport mItemSelectionSupport;
     MainActivityFragment.Callbacks mCallbacks;
     private List<YAMovie> movies = new ArrayList<>();
 
-    public MoviesRecyclerViewAdapter(MainActivityFragment.Callbacks callbacks) {
+    public MoviesRecyclerViewAdapter(MainActivityFragment.Callbacks callbacks, ItemSelectionSupport itemSelectionSupport) {
         super();
         mCallbacks = callbacks;
+        mItemSelectionSupport = itemSelectionSupport;
     }
 
     public void setData(List<YAMovie> movies) {
@@ -51,7 +55,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
     }
 
     @Override
-    public void onBindViewHolder(MoviesRecyclerViewAdapter.MovieViewHolder holder, int position) {
+    public void onBindViewHolder(MoviesRecyclerViewAdapter.MovieViewHolder holder, final int position) {
         final YAMovie movie = movies.get(position);
 
         //* Calculate the width of the screen and divide by two so each poster takes up its full column.
@@ -63,6 +67,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         int height = point.y;
         int imageWidth = (width / 2);
         int imageHeight = (height / 2);
+
         Picasso.with(holder.imageViewPoster.getContext()).load(movie.getPosterFullUrl()).resize(imageWidth, imageHeight).into(holder.imageViewPoster);
 
         //TODO: Loading Image and fail image if it were in production,
@@ -76,7 +81,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
             @Override
             public void onClick(View v) {
                 mCallbacks.onItemSelected(movie); //Go back to fragment which goes back to activity.
-
+                mItemSelectionSupport.setItemChecked(position, true);
             }
         });
 
