@@ -1,12 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:baselineAligned="false"
-    android:divider="?android:attr/dividerHorizontal"
-    android:orientation="horizontal"
-    android:showDividers="middle">
+
+    android:orientation="horizontal">
 
     <!--
     This layout is a two-pane layout for the Items
@@ -28,5 +24,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1" />
 
+    <!-- I'd sure be grateful if you could give me credit but help me figure out why I have  the big white borders on tablet in the grid? -->
 
 </LinearLayout>

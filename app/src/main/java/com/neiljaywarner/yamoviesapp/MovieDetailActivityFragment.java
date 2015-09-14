@@ -8,9 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -172,19 +169,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
     }
 
-    //TODO:  custom view with bound data like in dan lew tut. tried android data, didnt' work yet.
-    public View getTrailerView(final RelatedVideo relatedVideo) {
-        TextView tv = new TextView(this.getActivity());
-        tv.setText(relatedVideo.getName());
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openInYoutube(relatedVideo);
-            }
-        });
-        return tv;
-    }
-
     public View getCustomTrailerView(final RelatedVideo relatedVideo) {
         YoutubeThumbnailView relatedVideoView = new YoutubeThumbnailView(this.getActivity());
         relatedVideoView.bind(relatedVideo);
@@ -253,36 +237,6 @@ public class MovieDetailActivityFragment extends Fragment {
                         })
         );
 
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_movie_detail, menu);
-        //TODO: Remove if it moves to detail screen on tablet for consistency.
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_favorite) {
-            if (mApp.isFavorite(mMovie)) {
-                mApp.removeFavorite(mMovie);
-            } else {
-                mApp.saveFavorite(mMovie);
-            }
-
-            //TODO: Move to bar with actual movie title and toggle star.
-
-            return true;
-        }
-
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void toggleFavorite() {
