@@ -115,6 +115,7 @@ public class MainActivityFragment extends Fragment {
     private void updateMoviesPageWithFavorites() {
         mAdapter.setData(mFavoriteMovies);
     }
+
     private void updateMoviesPage() {
         updateMoviesPage(getCurrentSortType());
     }
@@ -141,7 +142,6 @@ public class MainActivityFragment extends Fragment {
 
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -150,7 +150,7 @@ public class MainActivityFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
         RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.myList);
         recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), NUM_COLUMNS_GRIDVIEW));
-        mAdapter = new MoviesRecyclerViewAdapter();
+        mAdapter = new MoviesRecyclerViewAdapter(((MainActivity) this.getActivity()));
 
         mCompositeSubscription = new CompositeSubscription();
 
@@ -218,6 +218,18 @@ public class MainActivityFragment extends Fragment {
     public void onDestroyView() {
         mCompositeSubscription.unsubscribe();
         super.onDestroyView();
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callbacks {
+        /**
+         * Callback for when an item has been selected.
+         */
+        void onItemSelected(YAMovie movie);
     }
 
 

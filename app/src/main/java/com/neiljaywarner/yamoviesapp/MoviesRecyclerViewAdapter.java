@@ -1,7 +1,6 @@
 package com.neiljaywarner.yamoviesapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
@@ -22,8 +21,13 @@ import java.util.List;
  */
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecyclerViewAdapter.MovieViewHolder> {
 
+    MainActivityFragment.Callbacks mCallbacks;
     private List<YAMovie> movies = new ArrayList<>();
 
+    public MoviesRecyclerViewAdapter(MainActivityFragment.Callbacks callbacks) {
+        super();
+        mCallbacks = callbacks;
+    }
 
     public void setData(List<YAMovie> movies) {
 
@@ -71,7 +75,8 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         holder.imageViewPoster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gotoDetailScreen(v.getContext(), movie);
+                mCallbacks.onItemSelected(movie); //Go back to fragment which goes back to activity.
+
             }
         });
 
@@ -96,15 +101,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesRecycl
         context.startActivity(ReviewsActivity.newIntent(context, movie));
     }
 
-    /**
-     * @param movie The movie to show details for.
-     */
-    private void gotoDetailScreen(Context context, YAMovie movie) {
-        Intent intent = new Intent(context, MovieDetailActivity.class);
 
-        intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
-        context.startActivity(intent);
-    }
     //TODO: MOve to newIntent pattern or similar as in ReviewsActivity - this class should not need to know about EXTRA_MOVIE and how to assemble intent
 
     @Override

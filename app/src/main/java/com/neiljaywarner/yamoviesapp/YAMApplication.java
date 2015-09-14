@@ -102,15 +102,12 @@ public class YAMApplication extends Application {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(prefKey, prefString);
         editor.apply();
-        Log.i("NJW", ">>>saVING_prefkey=" + prefKey + "/prefString=" + prefString);
 
-        Log.i("NJW", ">>>Gettign same=" + getStringPreference(prefKey));
     }
 
     private String getStringPreference(String prefKey) {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String prefString = sharedPreferences.getString(prefKey, "");
-        Log.i("NJW", "GETTING prefkey=" + prefKey + "/prefString=" + prefString);
 
         return prefString;
     }

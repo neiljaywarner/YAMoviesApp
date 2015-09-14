@@ -36,6 +36,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MovieDetailActivityFragment extends Fragment {
 
+    public static final String ARG_MOVIE = "arg_movie";
     private static final String TAG = MovieDetailActivityFragment.class.getSimpleName();
     YAMApplication mApp;
     @Bind(R.id.viewGroupTrailers)
@@ -52,10 +53,20 @@ public class MovieDetailActivityFragment extends Fragment {
     public MovieDetailActivityFragment() {
     }
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mApp = (YAMApplication) getActivity().getApplication();
+
+        if (getArguments() != null && getArguments().containsKey(ARG_MOVIE)) {
+            mMovie = getArguments().getParcelable(ARG_MOVIE);
+            this.getActivity().setTitle(mMovie.getOriginalTitle());
+        } else {
+            MovieDetailActivity movieDetailActivity = (MovieDetailActivity) getActivity();
+            mMovie = movieDetailActivity.getMovie();
+        }
+
     }
 
     @Override
@@ -70,8 +81,6 @@ public class MovieDetailActivityFragment extends Fragment {
         mTextViewYear = (TextView) root.findViewById(R.id.textViewYear);
         mTextViewOverview = (TextView) root.findViewById(R.id.textViewOverview);
 
-
-        mMovie = (YAMovie) this.getActivity().getIntent().getExtras().get(MovieDetailActivity.EXTRA_MOVIE);
 
         mTextViewTitle.setText(mMovie.getOriginalTitle());
 
