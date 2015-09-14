@@ -20,6 +20,7 @@ public class YAMApplication extends Application {
     private static final String PREFS_NAME = "yama_prefs";
     private static final String FAVORITES_LIST_STRING = "favorites_list_string";
     private static final String TAG = YAMApplication.class.getSimpleName();
+
     private String mFavoritesListString;
     private List<YAMovie> mFavoriteMovies = null;
 
@@ -27,8 +28,13 @@ public class YAMApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "app onCreate()");
-        mFavoritesListString = loadFavoritesListString(); //initializing/loading string from prefs.
         mFavoriteMovies = getFavorites();
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        Log.i(TAG, "app onTerminate()");
     }
 
     /**
@@ -37,6 +43,8 @@ public class YAMApplication extends Application {
     public List<YAMovie> getFavorites() {
         if (mFavoriteMovies == null || mFavoriteMovies.size() == 0) {
             mFavoritesListString = loadFavoritesListString();
+            Log.i(TAG, "Loading for the first time:" + mFavoritesListString);
+
         } else {
             return mFavoriteMovies;
         }
@@ -89,14 +97,19 @@ public class YAMApplication extends Application {
 
 
     private void saveSharedPreference(String prefKey, String prefString) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(prefKey, prefString);
-        sharedPreferences.edit().commit();
+        SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(prefKey, prefString);
+        editor.apply();
+        Log.i("NJW", ">>>saVING_prefkey=" + prefKey + "/prefString=" + prefString);
+
+        Log.i("NJW", ">>>Gettign same=" + getStringPreference(prefKey));
     }
 
     private String getStringPreference(String prefKey) {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String prefString = sharedPreferences.getString(prefKey, "");
+        Log.i("NJW", "GETTING prefkey=" + prefKey + "/prefString=" + prefString);
 
         return prefString;
     }

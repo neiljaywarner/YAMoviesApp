@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.neiljaywarner.yamoviesapp.model.MoviePage;
+import com.neiljaywarner.yamoviesapp.model.YAMovie;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -84,14 +87,24 @@ public class MainActivityFragment extends Fragment {
 
         if (id == R.id.action_refresh) {
             updateMoviesPage();
+            //NOTE: for now it's OK to reload/refresh when selecting the same one...
 
             return true;
         }
-        //NOTE: for now it's OK to reload/refresh when selecting the same one...
+
+        if (id == R.id.action_favorites) {
+            this.getActivity().setTitle(R.string.action_favorites);
+            updateMoviesPageWithFavorites();
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateMoviesPageWithFavorites() {
+        YAMApplication app = (YAMApplication) getActivity().getApplication();
+        List<YAMovie> favoriteMovies = app.getFavorites();
+        mAdapter.setData(favoriteMovies);
+    }
     private void updateMoviesPage() {
         updateMoviesPage(getCurrentSortType());
     }
@@ -132,7 +145,6 @@ public class MainActivityFragment extends Fragment {
         mCompositeSubscription = new CompositeSubscription();
 
         recyclerView.setAdapter(mAdapter);
-        this.getActivity().setTitle(R.string.most_popular);
 
         if (savedInstanceState == null) {
             updateMoviesPage();
