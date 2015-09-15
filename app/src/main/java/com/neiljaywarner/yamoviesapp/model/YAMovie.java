@@ -2,6 +2,7 @@ package com.neiljaywarner.yamoviesapp.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 
@@ -67,6 +68,9 @@ public class YAMovie implements Parcelable {
     //so example URL is http://image.tmdb.org/t/p/w185/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg
 
     public String getYear() {
+        if (TextUtils.isEmpty(release_date)) {
+            return "";
+        }
         return release_date.substring(0, 4);
     }
 
